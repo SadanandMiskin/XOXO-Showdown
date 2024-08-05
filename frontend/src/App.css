@@ -1,22 +1,53 @@
-.area{
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+body {
+  background-color: #ffd54f;
+  font-family: 'Bangers', cursive;
+}
+
+.area {
   display: flex;
   justify-content: center;
+  align-items: center;
+  /* height: 100vh; */
+  flex-direction: column;
+}
+
+.content {
+  background-color: #ff6b6b;
+  border: 8px solid #4ecdc4;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  /* transform: rotate(-2deg); */
+}
+
+.board-row:hover{
+  transform: rotate((2deg));
 }
 
 .square {
   background: #fff;
-  border: 1px solid #999;
+  border: 4px solid #45b7d1;
   float: left;
-  font-size: 24px;
+  font-size: 48px;
   font-weight: bold;
-  line-height: 34px;
-  height: 120px;
-  margin-right: -1px;
-  margin-top: -1px;
+  line-height: 100px;
+  height: 100px;
+  margin-right: -4px;
+  margin-top: -4px;
   padding: 0;
   text-align: center;
-  width: 120px;
-  font-size: 20px;
+  width: 100px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  color: #ff6b6b;
+  text-shadow: 2px 2px #4ecdc4;
+}
+
+.square:hover {
+  background-color: #ffd54f;
+  transform: scale(1.05);
 }
 
 .board-row:after {
@@ -26,8 +57,43 @@
 }
 
 .status {
+  margin-bottom: 20px;
+  font-size: 36px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 2px 2px #ff6b6b;
+}
+
+.valid {
+  height: 20px;
+  font-size: 24px;
+  color: #4ecdc4;
+  text-align: center;
   margin-bottom: 10px;
 }
-.valid{
-  height: 10px;
+
+h2, h4 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 32px;
+  max-width: 288px;
+  text-shadow: 2px 2px #ff6b6b;
+}
+h1 {
+  color: #9d00fe;
+  text-align: center;
+  margin-top: 20px;
+  /* margin-bottom: 70px; */
+  font-size: 4rem;
+  text-shadow: 2px 2px #00c8ff;
+}
+.board-row {
+  display: flex;
+}
+
+@media (max-width: 500px){
+  h1{
+    font-size: 4.5rem;
+  }
 }
