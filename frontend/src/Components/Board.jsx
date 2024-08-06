@@ -4,7 +4,9 @@ import Square from './Square'
 import '../App.css'
 import { Winner } from '../Hooks/Winner'
 
-const socket = io('https://rattle-fast-nemophila.glitch.me', {
+const backendUrl = 'https://rattle-fast-nemophila.glitch.me'
+//'http://localhost:3000'
+const socket = io(backendUrl, {
   transports: ['websocket'],
   withCredentials: true
 })
@@ -16,6 +18,7 @@ export const Board = () => {
   const [winner, setWinner] = useState(null)
   const [seconds, setSeconds] = useState(0)
   const [gameStatus, setGameStatus] = useState('Waiting for opponent...')
+  const [draw, setDraw] = useState(false)  
 
   useEffect(() => {
     socket.on('playerAssigned', (player) => {
@@ -56,6 +59,13 @@ export const Board = () => {
       setSeconds(3)
     })
 
+   
+    socket.on('draw', () => {
+      setDraw(true)
+      setGameStatus("It's a draw!")
+      setSeconds(3)
+    })
+
     return () => {
       socket.off('playerAssigned')
       socket.off('gameStart')
@@ -63,6 +73,8 @@ export const Board = () => {
       socket.off('nextTurn')
       socket.off('playerLeft')
       socket.off('roomFull')
+      socket.off('win')
+      socket.off('draw')  
     }
   }, [])
 
@@ -71,6 +83,7 @@ export const Board = () => {
       setGameStatus('Not Your Turn')
       return
     }
+    console.log(board)
 
     socket.emit('makeMove', { value: playerSymbol, index: i })
 
@@ -85,22 +98,22 @@ export const Board = () => {
       setSeconds(3)
       setGameStatus(`Winner: ${win}`)
     }
-    
   }
 
   useEffect(() => {
     let timer
     if (seconds > 0) {
       timer = setTimeout(() => setSeconds(seconds - 1), 1000)
-    } else if (seconds === 0 && winner) {
+    } else if (seconds === 0 && (winner || draw)) {  
       resetGame()
     }
     return () => clearTimeout(timer)
-  }, [seconds, winner])
+  }, [seconds, winner, draw])  
 
   const resetGame = () => {
     setBoard(Array(9).fill(null))
     setWinner(null)
+    setDraw(false) 
     setGameStatus('Start the Game: ')
     socket.emit('resetGame')
   }
@@ -110,7 +123,7 @@ export const Board = () => {
       <h1>XOXO ShowDown !!</h1>
       <div className="content">
         <h2>{gameStatus}</h2>
-        {winner && <h4>Resetting in {seconds} seconds</h4>}
+        {(winner || draw) && <h4>Resetting in {seconds} seconds</h4>} 
         {[0, 1, 2].map(row => (
           <div key={row} className="board-row">
             {[0, 1, 2].map(col => {

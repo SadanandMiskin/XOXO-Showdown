@@ -8,7 +8,8 @@ const app = express()
 const corsOptions = {
     origin: [
         'https://xoxo-showdown.vercel.app',
-        'https://xoxo.sadanandmiskin.xyz'
+        'https://xoxo.sadanandmiskin.xyz',
+        "http://localhost:5173"
     ],
     methods: ['GET', 'POST'],
     credentials: true 
@@ -23,6 +24,7 @@ const io = new Server(server, {
 
 let players = []
 let currentPlayer = 'X'
+let moveCount = 0  
 
 io.on("connection", (socket) => {
     if (players.length < 2) {
@@ -41,19 +43,34 @@ io.on("connection", (socket) => {
     }
 
     socket.on('makeMove', (data) => {
-        io.emit('updateBoard', data)
-        currentPlayer = currentPlayer === 'X' ? 'O' : 'X'
-        io.emit('nextTurn', currentPlayer)
+        moveCount++  
+
+        if (moveCount === 9) {  
+            io.emit('draw')
+            moveCount = 0  
+        } else {
+            io.emit('updateBoard', data)
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X'
+            io.emit('nextTurn', currentPlayer)
+        }
     })
 
     socket.on('win', (data) => {
         io.emit('win', data)
+        moveCount = 0  
+    })
+
+    socket.on('resetGame', () => {
+        moveCount = 0  
+        currentPlayer = 'X'
+        io.emit('gameStart', { players, currentPlayer })
     })
 
     socket.on('disconnect', () => {
         players = players.filter(player => player.id !== socket.id)
         if (players.length < 2) {
             io.emit('playerLeft')
+            moveCount = 0  
         }
     })
 })
